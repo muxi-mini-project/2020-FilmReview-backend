@@ -1,0 +1,240 @@
+swagger: '2.0'
+
+info:
+
+  description:  影评API
+  version: 1.0.0
+  title: server API
+  
+host: localhost
+basePath: /
+tags: 
+  - name: user
+    description: 用户
+  - name: review
+    description: 影评
+  - name: comment
+    description: 对影评的评论
+    
+schemes: 
+  - http
+  - https
+  
+paths:
+  /{review_id}/create_comment:
+    post:
+      tags:
+        - comment
+      summary: 用来创建评论，对应每一个review
+      parameters: 
+        - $ref: "#/parameters/token"
+          description: 后端通过token来获取user_id
+        - name: review_id
+          in: path
+          required: true
+          type: string
+        - name: comment
+          in: body
+          schema:
+            $ref: "#/definitions/comment"
+      responses:
+        200:
+          description: 评论发布成功
+        401:
+          description: token错误，该用户没有登陆
+
+  /{user_id}/self_comment:
+    post: #暂定
+      tags:
+        - comment
+      summary: 用来展示自己发过的评论
+      parameters:
+        - $ref: "#/parameters/token"
+        - name: user_id
+          in: path
+          required: true
+          type: string
+      respones:
+          200:
+            description: 成功返回数据
+            schema:
+              type: array
+                description: 结构体数组
+              items:
+                $ref: "#/definitions/comment"
+          401:
+            description: token验证失败，未登录
+          404:
+            description: 没有找到评论（待定）
+
+  /{user_id}/delete_comment:
+    post:
+      tags:
+        - comment
+      summary: 用来删除自己的评论
+      parameters:
+        - $ref: "#/parameters/token"
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: comment_id
+          in: body
+          schema:
+            properties:
+              comment_id:
+                type: string
+      responses: 
+        200:
+          description: 删除成功
+        401:
+          description: token验证失败，未登录
+
+  /{user_id}/delete_review:
+    post:
+      tags:
+        - review
+      summary: 删除影评
+      parameters:
+        - $ref: "#/parameters/token"
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: comment_id
+          in: body
+          schame:
+            required:
+              - ucomment_id
+            properties:
+              comment_id:
+                type: string
+      responses:
+        200:
+          description: 删除成功
+        401:
+          description: token验证失败，未登录
+
+  /{review_id}/see_review:
+    get:
+      tags:
+        - review
+      summary: 点开指定影评页面
+        - name: review_id
+          in: path
+          required: true
+          type: string
+      responses:
+          200:
+            descrition: 获取页面成功
+            schema:
+              type: array
+              items:
+                $ref: "#/definitions/review_comment"
+          #......
+
+
+
+
+definitions:
+  review:
+    description: 单纯的影评
+    required:
+      - review_id
+    properties:
+      review_id:
+        type: string
+      title:
+        type: string
+      context:
+        type: string
+      time:
+        type: string
+      tag:
+        type: string
+      picture:
+        type: string
+        description: 传照片的url
+      like_sum:
+        type: string
+        description: 点赞数
+
+  user_review:
+    description: 一个信息块，同时显示影评和用户信息
+    required:
+      - review_id
+      - user_id
+    properties:
+      user_id:
+        type: string
+      name:
+        type: string
+      user_picture:
+        type: string
+      review_id:
+        type: string
+      title:
+        type: string
+      context:
+        type: string
+      time:
+        type: string
+      tag:
+        type: string
+      picture:
+        type: string
+        description: 传照片的url
+      like_sum:
+        type: string
+        description: 点赞数
+
+  comment:
+    description: 评论信息
+    required:
+      - comment_id
+    properties:
+      comment_id:
+        type: string
+      content:
+        type: string
+      time:
+        type: string
+      like_sum:
+        type: string
+
+  user_comment:
+      description: 用户信息和评论的表
+      required:
+        - comment_id
+        - user_id
+      properties:
+        user_id:
+          type: string
+        user_name:
+          type: string
+        user_picture:
+          type: string
+        comment_id:
+          type: string
+        content:
+          type: string
+        time:
+          type: string
+        like_sum:
+          type: string
+
+  review_comment:
+    description: review的界面
+    required:
+      - review_id 
+      - comment_id
+    properties:
+      user_id:   
+   #......
+
+  parameters:
+    token:
+      name: token
+      in: header
+      required: true
+      type: string
