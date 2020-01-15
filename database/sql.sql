@@ -55,7 +55,7 @@ create table comment_like (
 create table comment (
     comment_id char(10) PRIMARY KEY not null,
     content TINYTEXT not null,
-    time varchar(30) not null,
+    time timestamp default current_timestamp,
     like_sum varchar(8) not null
 );
 
@@ -71,7 +71,7 @@ create table review (
     review_id char(10) PRIMARY KEY not null,
     title varchar(50) not null,
     content TEXT not null,
-    time varchar(30) not null,
+    time timestamp default current_timestamp,
     tag varchar(60) not null,
     picture varchar(50) not null,
     like_sum varchar(8) not null
