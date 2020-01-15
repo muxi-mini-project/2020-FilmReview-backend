@@ -8,13 +8,8 @@ create table user (
 create table follow (
     user_id1 char(6) not null,
     user_id2 char(6) not null,
-    INDEX id_index (user_id1)
-);
-
-create table fans (
-    user_id1 char(6) not null,
-    user_id2 char(6) not null,
-    INDEX id_index (user_id1)
+    INDEX id_index (user_id1),
+    INDEX id_index2 (user_id2)
 );
 
 create table album (
