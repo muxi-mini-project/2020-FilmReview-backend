@@ -7,7 +7,12 @@ import(
 )
 
 func init() {
-    database.DB = database.InitDB(database.DB)
+    database.DB,err := database.InitDB(database.DB)
+    if err != nil {
+        panic(err)
+    }
+    Func.CountInit(model.Count)
+    Func.CountSumInit(model.CountSum)
 }
 
 func main() {
@@ -16,6 +21,12 @@ func main() {
     //router.Post("路径",handler)
     router.Post("/review",Handler.Review)
     router.Get("/grounds",Handler.Grounds)
+    router.Get("/grounds/:user_id",Handler.GroundsID)
+    router.Get("/reviews/:review_id",Handler.GetReview)
+    router.Delete("/reviews/:review_id",Handler.DeleteReview)
+    router.Put("/reviews/:review_id",Handler.ChangeReviewLike)
+    router.PATCH("/reviews/:review_id",Handler.NewCollection)
+    router.Post("/reviews/:review_id/comment",Handler.NewComment)
     router.Run("localhost:9090/api/v1")
 }
 

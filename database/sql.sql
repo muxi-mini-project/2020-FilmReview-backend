@@ -43,6 +43,7 @@ create table review_like (
 create table comment_like (
     user_id char(6) not null,
     comment_id char(10) not null,
+    review_id char(10) not null,
     INDEX id_index (user_id)
 );
 

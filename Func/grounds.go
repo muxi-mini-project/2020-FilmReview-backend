@@ -2,29 +2,29 @@
 package Func
 
 import (
-    "sync"
-    "errors"
-    "strconv"
-    "log"
-    "github.com/gin-gonic/gin"
-    "github.com/muxi-mini-project/2020-FilmReview-backend/filmer/database"
-    "github.com/muxi-mini-project/2020-FilmReview-backend/filmer/model"
-    _ "github.com/go-sql-driver/mysql"
+	"errors"
+	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/database"
+	"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/model"
+	"log"
+	"strconv"
+	"sync"
 )
 
 func CountInit(count int) {
-    count = -3
-    return
+	count = -3
+	return
 }
 
 func CountSumInit(countSum int) {
-    countSum = 100000
-    return
+	countSum = 100000
+	return
 }
 
 //一次返回四张
 //这是正常情况
-func GetGround(count int) ([]model.GroundInfos,error) {
+/*func GetGround(count int) ([]model.GroundInfos,error) {
     var groundInfos []model.GroundInfos
     sql:= "select review_id，user_id from myreviews limit "+strconv.Iota(count)+",4"
     if err := DB.Raw(sql).Scan(&groundInfos).Error();err != nil {
@@ -105,4 +105,56 @@ func GetGroundInfos(count int) ([]model.GroundInfos,err) {
 
 func GetGroundID() ([]model.GroundInfos,error) {
     var groundInfos []model.GroundInfos
-    sql := "select user_id from 
+    sql := "select user_id from "*/
+
+//新版本
+func GetGround(count) ([]model.GroundInfos, error) {
+	var ground []model.GroundInfos
+	sql := "select review_id,title,content,time,tag,picture,comment_sum,like_sum from user_review limit " + strconv.Iota(count) + ",4"
+	if err := database.DB.Raw(sql).Scan(&ground).Error(); err != nil {
+		return nil, errors.New("surver busy")
+	}
+	return ground, nil
+}
+
+//查看关注的界面
+func GetGroundInfos(userid string, ground model.GroundInfosID) error {
+	sql := "select name,user_picture,review_id,title string,content,time,tag,picture,comment_sum,like_sum from user_review where user_id = " + userid
+	if err := database.DB.Raw(sql).Scan(&ground).Error(); err != nil {
+		return nil, errors.New("surver busy")
+	}
+	return ground, nil
+}
+
+//获取关注的id
+func GetUserID(userid string) ([]model.GroundInfos, error) {
+	var ground []model.GroundInfosID
+	sql := "select user_id2 from follow where user_id1 = " + userid
+	if err := database.DB.Raw(sql).Scan("use_id2", &ground).Error(); err != nil {
+		return nil, errors.New("surver busy")
+	}
+	return ground, nil
+}
+
+func GetGroundAll(userid string) ([]model.GroundInfosID, error) {
+	//先获取id
+	if ground, err := GetUserID(userid); err != nil {
+		return nil, errors.New("surver busy")
+	}
+
+	//接下来通过并发获取每个id的review
+	index := len(userids)
+	wg := sync.WaitGroup{}
+	wg.Add(index)
+
+	for i := 0; i < index; i++ {
+		go func() {
+			if err2 := GetGroundInfos(ground[i].user_id2, ground[i]); err != nil {
+				return nil, errors.New("surver bussy")
+			}
+			wg.Done()
+		}()
+	}
+	wg.wait()
+	return ground, nil
+}

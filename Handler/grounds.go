@@ -12,7 +12,7 @@ func Grounds(c *gin.Context) {
 	//收到请求直接返回结构体
 	//一次性返回四个记录
 	model.Count += 4
-	if groundInfos, err := Func.GetGroundInfos(model.Count); err != nil {
+	if groundInfos, err := Func.GetGround(model.Count); err != nil {
 		c.JSON(404, gin.H{
 			"message": "Not Found",
 		})
@@ -30,15 +30,25 @@ func Grounds(c *gin.Context) {
 }
 
 func GroundsID(c *gin.Context) {
-    user_id := c.Param("user_id")
-    //解析token
-    strToken := c.Param("token")
-    claim, err := Func.VarifToken(strToken)
-    if err != nil {
-        c.JSON(401, gin.H{
-            "message": "Wrong Token",
-        })
-        return
-    }
+	user_id := c.Param("user_id")
+	//解析token
+	strToken := c.Param("token")
+	claim, err := Func.VarifToken(strToken)
+	if err != nil {
+		c.JSON(401, gin.H{
+			"message": "Wrong Token",
+		})
+		return
+	}
 
-    
+	if ground, err := Func.GetGroundAll(claim.UserID); err != nil {
+		c.JSON(500, gin.H{
+			"message": "surver busy",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"Ground": ground,
+	})
+}
