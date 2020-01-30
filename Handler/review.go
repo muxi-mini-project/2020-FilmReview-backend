@@ -35,7 +35,7 @@ func Review(c *gin.Context) {
 	reviewID := strconv.Itoa(model.CountSum + 1)
 
 	//获取userid的信息
-	userInfo, err := Func.GetUserInfo(claim.UerID)
+	userInfo, err := Func.GetUserInfo(claim.UserID)
 
 	//插入review表
 	if err2 := Func.InsertReview(review, reviewID, userInfo, claim.UserID); err2 != nil {
@@ -73,11 +73,11 @@ func GetReview(c *gin.Context) {
 			"review_like":       false,
 			"review_collection": false,
 		})
-        return
+		return
 	}
 	//登陆了还要获取参数
 
-    com,rev,col := Func.GetExtraInfo(comment,claim.UserID,review_id)
+	com, rev, col := Func.GetExtraInfo(comment, claim.UserID, review_id)
 
 	c.JSON(200, gin.H{
 		"comment":           comment,
@@ -88,64 +88,136 @@ func GetReview(c *gin.Context) {
 }
 
 func DeleteReview(c *gin.Context) {
-    //先拿到id路径参数
-    review_id := c.Param("review_id")
-    //再查看token
-    strToken := c.Param("token")
-    claim, err := Func.VarifToken(strToken)
-    if err != nil {
-        c.JSON(401, gin.H{
-            "message": "Wrong Token",
-        })
-        return
-    }
+	//先拿到id路径参数
+	review_id := c.Param("review_id")
+	//再查看token
+	strToken := c.Param("token")
+	claim, err := Func.VarifToken(strToken)
+	if err != nil {
+		c.JSON(401, gin.H{
+			"message": "Wrong Token",
+		})
+		return
+	}
 
-    if err := DeleteFunc(claim.UserID,review_id);err != nil {
-        c.JSON(400,gin.H{
-            "message":"bad request",
-        }
-        return
-    }
+	if err := DeleteFunc(claim.UserID, review_id); err != nil {
+		c.JSON(400, gin.H{
+			"message": "bad request",
+		})
+		return
+	}
 
-    c.JSON(200,gin.H{
-        "message":"delete successfully",
-    }
+	c.JSON(200, gin.H{
+		"message": "delete successfully",
+	})
 }
 
 func ChangeReviewLike(c *gin.Context) {
-    //先拿到id路径参数
-    review_id := c.Param("review_id")
-    //再查看token
-    strToken := c.Param("token")
-    claim, err := Func.VarifToken(strToken)
-    if err != nil {
-        c.JSON(401, gin.H{
-            "message": "Wrong Token",
-        })
-        return
-    }
+	//先拿到id路径参数
+	review_id := c.Param("review_id")
+	//再查看token
+	strToken := c.Param("token")
+	claim, err := Func.VarifToken(strToken)
+	if err != nil {
+		c.JSON(401, gin.H{
+			"message": "Wrong Token",
+		})
+		return
+	}
 
-    ChangeReviewLikeFunc(claim.UserID,review_id)
-    c.JSON(200,gin.H{
-        "message":"ok",
-    })
+	ChangeReviewLikeFunc(claim.UserID, review_id)
+	c.JSON(200, gin.H{
+		"message": "ok",
+	})
 }
 
 func NewCollection(c *gin.Context) {
-    //先拿到id路径参数
-    review_id := c.Param("review_id")
-    //再查看token
-    strToken := c.Param("token")
-    claim, err := Func.VarifToken(strToken)
-    if err != nil {
-        c.JSON(401, gin.H{
-            "message": "Wrong Token",
-        })
-        return
-    }
+	//先拿到id路径参数
+	review_id := c.Param("review_id")
+	//再查看token
+	strToken := c.Param("token")
+	claim, err := Func.VarifToken(strToken)
+	if err != nil {
+		c.JSON(401, gin.H{
+			"message": "Wrong Token",
+		})
+		return
+	}
 
-    NewCollection(claim.UserID,review_id)
-    c.JSON(200,gin.H{
-        "message":"ok",
-    })
+	NewCollection(claim.UserID, review_id)
+	c.JSON(200, gin.H{
+		"message": "ok",
+	})
+}
+
+func NewComment(c *gin.Context) {
+	//先拿到id路径参数
+	review_id := c.Param("review_id")
+	//解析token
+	strToken := c.Param("token")
+	claim, err := Func.VarifToken(strToken)
+	if err != nil {
+		c.JSON(401, gin.H{
+			"message": "Wrong Token",
+		})
+		return
+	}
+
+	var comment model.Comment
+	if err := c.BindJSON(&comment); err != nil {
+		c.JSON(400, gin.H{
+			"message": "Lost parameters",
+		})
+		return
+	}
+
+	if err := Func.NewComment(claim.UserID, review_id, comment); err != nil {
+		c.JSON("surver busy")
+		return
+	}
+
+	//请求成功，获取时间并返回
+	t := time.Now().Format("2006-01-02 15:04:05")
+	c.JSON(200, gin.H{
+		"review_id": reviewID,
+		"time":      t,
+	})
+}
+
+func NewCommentLike(c *gin.Context) {
+	//先拿到id路径参数
+	comment_id := c.Param("comment_id")
+	//再查看token
+	strToken := c.Param("token")
+	claim, err := Func.VarifToken(strToken)
+	if err != nil {
+		c.JSON(401, gin.H{
+			"message": "Wrong Token",
+		})
+		return
+	}
+
+	Func.NewCommentLike(claim.UserID, comment_id)
+	c.JSON(200, gin.H{
+		"message": "ok",
+	})
+}
+
+func DeleteComment(c *gin.Context) {
+	//先拿到id路径参数
+	comment_id := c.Param("comment_id")
+	//再查看token
+	strToken := c.Param("token")
+	claim, err := Func.VarifToken(strToken)
+	if err != nil {
+		c.JSON(401, gin.H{
+			"message": "Wrong Token",
+		})
+		return
+	}
+
+	Func.DeleteCommentFunc(comment_id)
+	c.JSON(200, gin.H{
+		"message": "ok",
+	})
 }

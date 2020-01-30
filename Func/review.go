@@ -8,6 +8,7 @@ import (
 	"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/model"
 	"log"
 	"strconv"
+	"sync"
 )
 
 //通过全局变量CountSum实现
@@ -227,7 +228,7 @@ func ChangeReviewLikeFunc(userID, reviewID string) {
 }
 
 //修改like_sum
-func AddReviewLikeSum(reviewID) {
+func AddReviewLikeSum(reviewID string) {
 	var likeSum model.Sum
 	sql := "select like_sum from review where review_id = " + reviewID
 	database.DB.Raw(sql).Scan(&likeSum)
@@ -237,7 +238,7 @@ func AddReviewLikeSum(reviewID) {
 	return
 }
 
-func DeleteReviewLikeSum(reviewID) {
+func DeleteReviewLikeSum(reviewID string) {
 	var likeSum model.Sum
 	sql := "select like_sum from review where review_id = " + reviewID
 	database.DB.Raw(sql).Scan(&likeSum)
@@ -257,5 +258,167 @@ func NewCollection(userID, reviewID string) {
 
 	sql1 := "delete from collection where user_id = " + userID + " AND review_id = " + reviewID
 	database.DB.Raw(sql1)
+	return
+}
+
+func GetCommentID() int {
+	var commentID model.CommentID
+	sql := "select count(*) from comment"
+	database.Raw(sql).Scan(&commentID)
+	return commentID
+}
+
+func InsertComment(userID string, userInfo model.UserInfo, reviewID string, comment model.Comment, commentID int) error {
+	sql := "insert into comment(user_id,name,user_picture,review_id,comment_id,content,time,like_sum) values(" + userID + "," + userInfo.name + "," + userInfo.user_picture + "," + reviewID + "," + commentID + "," + comment.content + "," + comment.like_sum + ")"
+	if err := database.Raw(sql).Error(); err != nil {
+		return errors.New("surver busy")
+	}
+
+	return nil
+}
+
+//修改评论数
+func AddCommentSum(reviewID string) {
+	var commentSum model.Sum
+	sql := "select comment_sum from review where review_id = " + reviewID
+	database.DB.Raw(sql).Scan(&commentSum)
+	likeSum += 1
+	sql2 := "update review set comment_sum = " + strconv.Atoi(likeSum) + " where review_id = " + reviewID
+	database.DB.Raw(sql2)
+	return
+}
+
+func DeleteCommentSum(reviewID string) {
+	var commentSum model.Sum
+	sql := "select comment_sum from review where review_id = " + reviewID
+	database.DB.Raw(sql).Scan(&commentSum)
+	likeSum -= 1
+	sql2 := "update review set comment_sum = " + strconv.Atoi(likeSum) + " where review_id = " + reviewID
+	database.DB.Raw(sql2)
+	return
+}
+
+func NewComment(userID string, reviewID string, comment model.Comment) error {
+	//并发处理获取commentid和user信息
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+
+	var commentID int
+	var userInfo model.UserInfo
+	var err1 error
+
+	go func() {
+		//获取commentid
+		commentID = GetCommentID()
+		commentID++
+		wg.Done()
+	}()
+
+	go func() {
+		//获取userid的信息
+		userInfo, err1 = GetUserInfo(userID)
+		if err1 != nil {
+			return errors.New("server busy")
+		}
+		wg.Done()
+	}()
+
+	wg.Wait()
+
+	//再并发处理插入comment和修改commentsum
+
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+
+	var err2 error
+
+	go func() {
+		//插入comment表
+		if err2 = Func.InsertComment(userID, userInfo, reviewID, comment, commentID); err2 != nil {
+			return errors.New("server busy")
+		}
+		wg.Done()
+	}()
+
+	go func() {
+		//修改review的评论总数
+		AddCommentSum := Func.CommentSum(reviewID)
+		wg.Done()
+	}()
+
+	wg.Wait()
+
+	return nil
+}
+
+func NewCommentLike(userID, commentID string) {
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+
+	var ok bool
+	var reviewID model.ReviewID
+
+	go func() {
+		sql := "select *from comment_like where user_id = " + userID + " AND comment_id = " + commentID
+		ok := database.DB.Raw(sql).RecordNotFound()
+		wg.Done()
+
+	}()
+
+	go func() {
+		sql := "select review_id from comment where comment_id = " + commentID
+		database.Raw(sql).Scan(reviewID)
+		wg.Done()
+	}()
+
+	wg.Wait()
+
+	if ok {
+		sql1 := "insert into comment_like(user_id,comment_id,review_id) values(" + userID + "," + commentID + "," + reviewID.review_id + ")"
+		database.DB.Raw(sql1)
+		return
+	}
+
+	sql1 := "delete from collection where user_id = " + userID + " AND comment_id = " + commentID
+	database.DB.Raw(sql1)
+	return
+}
+
+func DeleteComment(commentID int) {
+	sql := "delete from comment where comment_id = " + commentID
+	database.DB.Raw(sql)
+	return
+}
+
+func DeleteCommentLike(commentID int) {
+	sql := "delete from comment_like where comment_id = " + commentID
+	database.DB.Raw(sql)
+	return
+}
+
+func DeleteCommentFunc(commentID int) {
+	var reviewID model.ReviewID
+	sql := "select review_id from comment where comment_id = " + commentID
+	database.Raw(sql).Scan(reviewID)
+	wg := sync.Wait{}
+	wg.Add(3)
+
+	go func() {
+		DeleteComment(commentID)
+		wg.Done()
+	}()
+
+	go func() {
+		DeleteCommentLike(commentID)
+		wg.Done()
+	}()
+
+	go func() {
+		DeleteCommentSum(reviewID.review_id)
+		wg.Done()
+	}()
+
+	wg.Wait()
+
 	return
 }

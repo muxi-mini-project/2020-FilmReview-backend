@@ -42,7 +42,7 @@ create table review_like (
 
 create table comment_like (
     user_id char(6) not null,
-    comment_id char(10) not null,
+    comment_id int not null,
     review_id char(10) not null,
     INDEX id_index (user_id)
 );
@@ -52,7 +52,7 @@ create table comment (
     name varchar(30) not null,
     user_picture varchar(50) not null,
     review_id char(10) not null,
-    comment_id char(10)  not null,
+    comment_id int  not null,
     content TINYTEXT not null,
     time timestamp default current_timestamp,
     like_sum int not null,

@@ -3,11 +3,11 @@ package Func
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
+	//"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/database"
 	"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/model"
-	"log"
+    //"log"
 	"strconv"
 	"sync"
 )
@@ -108,19 +108,19 @@ func GetGroundID() ([]model.GroundInfos,error) {
     sql := "select user_id from "*/
 
 //新版本
-func GetGround(count) ([]model.GroundInfos, error) {
+func GetGround(count int) ([]model.GroundInfos, error) {
 	var ground []model.GroundInfos
-	sql := "select review_id,title,content,time,tag,picture,comment_sum,like_sum from user_review limit " + strconv.Iota(count) + ",4"
-	if err := database.DB.Raw(sql).Scan(&ground).Error(); err != nil {
+	sql := "select review_id,title,content,time,tag,picture,comment_sum,like_sum from user_review limit " + strconv.Itoa(count) + ",4"
+	if err := database.DB.Raw(sql).Scan(&ground).Error; err != nil {
 		return nil, errors.New("surver busy")
 	}
 	return ground, nil
 }
 
 //查看关注的界面
-func GetGroundInfos(userid string, ground model.GroundInfosID) error {
+func GetGroundInfos(userid string, ground model.GroundInfosID) (model.GroundInfosID,error) {
 	sql := "select name,user_picture,review_id,title string,content,time,tag,picture,comment_sum,like_sum from user_review where user_id = " + userid
-	if err := database.DB.Raw(sql).Scan(&ground).Error(); err != nil {
+	if err := database.DB.Raw(sql).Scan(&ground).Error; err != nil {
 		return nil, errors.New("surver busy")
 	}
 	return ground, nil
