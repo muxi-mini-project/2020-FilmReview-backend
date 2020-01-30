@@ -18,14 +18,12 @@ create table album (
     title varchar(30) not null,
     summary TINYTEXT not null,
     content_sum varchar(3) not null,
-    UNIQUE id (user_id,album_id)
 );
 
 create table album_review (
     user_id char(6) not null,
     album_id char(3) not null,
     review_id char(10) not null,
-    UNIQUE id (user_id,album_id)
 );
 
 create table collection (
@@ -56,7 +54,6 @@ create table comment (
     content TINYTEXT not null,
     time timestamp default current_timestamp,
     like_sum int not null,
-    UNIQUE id (user_id,comment_id,review_id)
 );
 
 create table user_review (
@@ -71,5 +68,4 @@ create table user_review (
     picture varchar(50) not null,
     comment_sum int not null,
     like_sum int not null default 0,
-    UNIQUE id (user_id,review_id)
 )
