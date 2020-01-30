@@ -1,12 +1,12 @@
 package main
 
-import(
+import (
 	"fmt"
 	"github.com/project/model"
 	"github.com/project/router"
 )
 
-func main(){
+func main() {
 	model.Db.Init()
 	defer model.Db.Close()
 
