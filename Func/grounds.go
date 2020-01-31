@@ -7,7 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/database"
 	"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/model"
-    //"log"
+	//"log"
 	"strconv"
 	"sync"
 )
@@ -118,43 +118,45 @@ func GetGround(count int) ([]model.GroundInfos, error) {
 }
 
 //查看关注的界面
-func GetGroundInfos(userid string, ground model.GroundInfosID) (model.GroundInfosID,error) {
+func GetGroundInfos(userid string, ground model.GroundInfosID) error {
 	sql := "select name,user_picture,review_id,title string,content,time,tag,picture,comment_sum,like_sum from user_review where user_id = " + userid
 	if err := database.DB.Raw(sql).Scan(&ground).Error; err != nil {
-		return nil, errors.New("surver busy")
+		return errors.New("surver busy")
 	}
-	return ground, nil
+	return nil
 }
 
 //获取关注的id
-func GetUserID(userid string) ([]model.GroundInfos, error) {
+func GetUserID(userid string) ([]model.GroundInfosID, error) {
 	var ground []model.GroundInfosID
 	sql := "select user_id2 from follow where user_id1 = " + userid
-	if err := database.DB.Raw(sql).Scan("use_id2", &ground).Error(); err != nil {
+	if err := database.DB.Raw(sql).Pluck("use_id2", &ground).Error; err != nil {
 		return nil, errors.New("surver busy")
 	}
 	return ground, nil
 }
 
 func GetGroundAll(userid string) ([]model.GroundInfosID, error) {
+	var ground []model.GroundInfosID
+	var err error
 	//先获取id
-	if ground, err := GetUserID(userid); err != nil {
+	if ground, err = GetUserID(userid); err != nil {
 		return nil, errors.New("surver busy")
 	}
 
 	//接下来通过并发获取每个id的review
-	index := len(userids)
+	index := len(userid)
 	wg := sync.WaitGroup{}
 	wg.Add(index)
 
 	for i := 0; i < index; i++ {
 		go func() {
-			if err2 := GetGroundInfos(ground[i].user_id2, ground[i]); err != nil {
-				return nil, errors.New("surver bussy")
+			if err2 := GetGroundInfos(ground[i].User_id2, ground[i]); err2 != nil {
+				//return nil, errors.New("surver bussy")//并发错误处理
 			}
 			wg.Done()
 		}()
 	}
-	wg.wait()
+	wg.Wait()
 	return ground, nil
 }

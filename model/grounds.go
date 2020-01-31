@@ -3,32 +3,32 @@ package model
 
 //要返回的页面
 type GroundInfos struct {
-	user_id      string
-	name         string
-	user_picture string
-	review_id    string
-	title        string
-	content      string
-	time         string
-	tag          string
-	picture      string
-	comment_sum  string
-	like_sum     string
+	User_id      string
+	Name         string
+	User_picture string
+	Review_id    string
+	Title        string
+	Content      string
+	Time         string
+	Tag          string
+	Picture      string
+	Comment_sum  string
+	Like_sum     string
 }
 
 //用来导出关注的user
 type GroundInfosID struct {
-	user_id2     string
-	name         string
-	user_picture string
-	review_id    string
-	title        string
-	content      string
-	time         string
-	tag          string
-	picture      string
-	comment_sum  string
-	like_sum     string
+	User_id2     string
+	Name         string
+	User_picture string
+	Review_id    string
+	Title        string
+	Content      string
+	Time         string
+	Tag          string
+	Picture      string
+	Comment_sum  string
+	Like_sum     string
 }
 
 //用来计算轮到哪个评论区间

@@ -4,10 +4,11 @@ package Handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/Func"
-	"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/database"
+	//"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/database"
 	"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/model"
 	"log"
-	"sync"
+	//"sync"
+	"strconv"
 	"time"
 )
 
@@ -15,7 +16,7 @@ func Review(c *gin.Context) {
 	log.Println("ReviewHandler start!")
 	//解析token
 	strToken := c.Param("token")
-	claim, err := Func.VarifToken(strToken)
+	claim, err := Func.VerifyToken(strToken)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
@@ -55,7 +56,9 @@ func Review(c *gin.Context) {
 
 func GetReview(c *gin.Context) {
 	review_id := c.Param("review_id")
-	if comment, err := GetReview(review_id); err != nil {
+	var comment []model.CommentInfo
+	var err error
+	if comment, err = Func.GetReview(review_id); err != nil {
 		c.JSON(500, gin.H{
 			"message": "surver busy",
 		})
@@ -64,7 +67,7 @@ func GetReview(c *gin.Context) {
 
 	//成功获取，获取token
 	strToken := c.Param("token")
-	claim, err := Func.VarifToken(strToken)
+	claim, err := Func.VerifyToken(strToken)
 	//如果没登陆，下面三个参数返回false
 	if err != nil {
 		c.JSON(200, gin.H{
@@ -92,7 +95,7 @@ func DeleteReview(c *gin.Context) {
 	review_id := c.Param("review_id")
 	//再查看token
 	strToken := c.Param("token")
-	claim, err := Func.VarifToken(strToken)
+	claim, err := Func.VerifyToken(strToken)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
@@ -100,7 +103,7 @@ func DeleteReview(c *gin.Context) {
 		return
 	}
 
-	if err := DeleteFunc(claim.UserID, review_id); err != nil {
+	if err := Func.DeleteFunc(claim.UserID, review_id); err != nil {
 		c.JSON(400, gin.H{
 			"message": "bad request",
 		})
@@ -117,7 +120,7 @@ func ChangeReviewLike(c *gin.Context) {
 	review_id := c.Param("review_id")
 	//再查看token
 	strToken := c.Param("token")
-	claim, err := Func.VarifToken(strToken)
+	claim, err := Func.VerifyToken(strToken)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
@@ -125,7 +128,7 @@ func ChangeReviewLike(c *gin.Context) {
 		return
 	}
 
-	ChangeReviewLikeFunc(claim.UserID, review_id)
+	Func.ChangeReviewLikeFunc(claim.UserID, review_id)
 	c.JSON(200, gin.H{
 		"message": "ok",
 	})
@@ -136,7 +139,7 @@ func NewCollection(c *gin.Context) {
 	review_id := c.Param("review_id")
 	//再查看token
 	strToken := c.Param("token")
-	claim, err := Func.VarifToken(strToken)
+	claim, err := Func.VerifyToken(strToken)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
@@ -144,7 +147,7 @@ func NewCollection(c *gin.Context) {
 		return
 	}
 
-	NewCollection(claim.UserID, review_id)
+	Func.NewCollection(claim.UserID, review_id)
 	c.JSON(200, gin.H{
 		"message": "ok",
 	})
@@ -155,7 +158,7 @@ func NewComment(c *gin.Context) {
 	review_id := c.Param("review_id")
 	//解析token
 	strToken := c.Param("token")
-	claim, err := Func.VarifToken(strToken)
+	claim, err := Func.VerifyToken(strToken)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
@@ -172,14 +175,16 @@ func NewComment(c *gin.Context) {
 	}
 
 	if err := Func.NewComment(claim.UserID, review_id, comment); err != nil {
-		c.JSON("surver busy")
+		c.JSON(500, gin.H{
+			"message": "surver busy",
+		})
 		return
 	}
 
 	//请求成功，获取时间并返回
 	t := time.Now().Format("2006-01-02 15:04:05")
 	c.JSON(200, gin.H{
-		"review_id": reviewID,
+		"review_id": review_id,
 		"time":      t,
 	})
 }
@@ -189,7 +194,7 @@ func NewCommentLike(c *gin.Context) {
 	comment_id := c.Param("comment_id")
 	//再查看token
 	strToken := c.Param("token")
-	claim, err := Func.VarifToken(strToken)
+	claim, err := Func.VerifyToken(strToken)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
@@ -208,7 +213,7 @@ func DeleteComment(c *gin.Context) {
 	comment_id := c.Param("comment_id")
 	//再查看token
 	strToken := c.Param("token")
-	claim, err := Func.VarifToken(strToken)
+	_, err := Func.VerifyToken(strToken)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
@@ -216,7 +221,8 @@ func DeleteComment(c *gin.Context) {
 		return
 	}
 
-	Func.DeleteCommentFunc(comment_id)
+	commentID, _ := strconv.Atoi(comment_id)
+	Func.DeleteCommentFunc(commentID)
 	c.JSON(200, gin.H{
 		"message": "ok",
 	})

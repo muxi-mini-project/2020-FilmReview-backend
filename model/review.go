@@ -2,12 +2,12 @@
 package model
 
 type Review struct {
-	title       string
-	content     string
-	tag         string
-	picture     string
-	comment_sum int
-	like_sum    int
+	Title       string
+	Content     string
+	Tag         string
+	Picture     string
+	Comment_sum int
+	Like_sum    int
 }
 
 /*type Count struct {
@@ -15,34 +15,34 @@ type Review struct {
 }*/
 
 type UserInfo struct {
-	name         string
-	user_picture string
+	Name         string
+	User_picture string
 }
 
 type CommentInfo struct {
-	user_id      string
-	name         string
-	user_picture string
-	comment_id   string
-	content      string
-	time         string
-	like_sum     int
+	User_id      string
+	Name         string
+	User_picture string
+	Comment_id   string
+	Content      string
+	Time         string
+	Like_sum     int
 }
 
 //获取likesum
 type Sum struct {
-	sum int
+	Sum int
 }
 
 type Comment struct {
-	content  string
-	like_sum int
+	Content  string
+	Like_sum int
 }
 
 type CommentID struct {
-	comment_id int
+	Comment_id int
 }
 
 type ReviewID struct {
-	review_id int
+	Review_id string
 }

@@ -7,7 +7,8 @@ import (
 )
 
 var DB *gorm.DB
-var Err error
+
+//var Err error
 
 func InitDB(DB *gorm.DB) *gorm.DB {
 	log.Println("DB Connect Start")

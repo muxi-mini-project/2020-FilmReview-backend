@@ -9,3 +9,5 @@ type JWTClaims struct {
 	jwt.StandardClaims
 	UserID string
 }
+
+var Secret = "filmer"

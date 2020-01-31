@@ -3,16 +3,18 @@ package Handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/Func"
-	"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/database"
+	//"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/database"
 	"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/model"
-	"log"
+	//"log"
 )
 
 func Grounds(c *gin.Context) {
 	//收到请求直接返回结构体
 	//一次性返回四个记录
+	var groundInfos []model.GroundInfos
+	var err error
 	model.Count += 4
-	if groundInfos, err := Func.GetGround(model.Count); err != nil {
+	if groundInfos, err = Func.GetGround(model.Count); err != nil {
 		c.JSON(404, gin.H{
 			"message": "Not Found",
 		})
@@ -30,10 +32,10 @@ func Grounds(c *gin.Context) {
 }
 
 func GroundsID(c *gin.Context) {
-	user_id := c.Param("user_id")
+	//user_id := c.Param("user_id")
 	//解析token
 	strToken := c.Param("token")
-	claim, err := Func.VarifToken(strToken)
+	claim, err := Func.VerifyToken(strToken)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
@@ -41,7 +43,9 @@ func GroundsID(c *gin.Context) {
 		return
 	}
 
-	if ground, err := Func.GetGroundAll(claim.UserID); err != nil {
+	var ground []model.GroundInfosID
+	var err2 error
+	if ground, err2 = Func.GetGroundAll(claim.UserID); err2 != nil {
 		c.JSON(500, gin.H{
 			"message": "surver busy",
 		})
