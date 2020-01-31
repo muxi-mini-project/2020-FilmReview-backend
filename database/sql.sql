@@ -17,13 +17,13 @@ create table album (
     album_id char(3) not null,
     title varchar(30) not null,
     summary TINYTEXT not null,
-    content_sum varchar(3) not null,
+    content_sum varchar(3) not null
 );
 
 create table album_review (
     user_id char(6) not null,
     album_id char(3) not null,
-    review_id char(10) not null,
+    review_id char(10) not null
 );
 
 create table collection (
@@ -53,7 +53,7 @@ create table comment (
     comment_id int  not null,
     content TINYTEXT not null,
     time timestamp default current_timestamp,
-    like_sum int not null,
+    like_sum int not null
 );
 
 create table user_review (
@@ -67,5 +67,5 @@ create table user_review (
     tag varchar(60) not null,
     picture varchar(50) not null,
     comment_sum int not null,
-    like_sum int not null default 0,
+    like_sum int not null default 0
 )
