@@ -207,6 +207,7 @@ func AddReviews(c *gin.Context){
 
 }
 
+//从专辑中移除影评
 func RemoveReviews(c *gin.Context){
 	token:=c.Request.Header.Get("token")
 	_,err:=model.VerifyToken(token)
@@ -230,6 +231,21 @@ func RemoveReviews(c *gin.Context){
 }
 
 //用户主页－收藏
+func Collection(c *gin.Context){
+	token:=c.Request.Header.Get("token")
+	claims,err1:=model.VerifyToken(token)
+	if err1!=nil{
+		c.JSON(401,err1.Error())
+		return
+	}
+
+	reviews,err2:=model.GetCollection(claims.UserID)
+	if err2!=nil{
+		c.JSON(400,err2.Error())
+		return 
+	}
+	c.JSON(200,reviews)
+}
 
 
 

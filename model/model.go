@@ -232,7 +232,7 @@ func GetTheAlbum(user_id string, album_id string) ([]Review, error) {
 	}
 //设定了切片初始长度,和容量,直接声明切片会index超出
 	reviews:=make([]Review,len(review_ids),30)
-	for i:=0; i<len(review_ids); i++{                        
+	for i:=0; i<len(review_ids); i++{                                       //这里需要用索引　Find  [i]                      
 		if err:=Db.Self.Table("user_review").Where("review_id=?",review_ids[i]).Find(&reviews[i]).Error;err!=nil{
 			log.Println("GetTheAlbum2 "+err.Error())
 			return nil,err
@@ -295,6 +295,23 @@ func RemoveReviewsFromAlbum(album_review []AlbumReview) error{
 	return nil
 }
 
+//用户主页——收藏
+func GetCollection(user_id string) ([]Review, error){
+	var review_ids []string
+	if err:=Db.Self.Table("collection").Where("user_id=?",user_id).Pluck("review_id",&review_ids).Error;err!=nil{
+		log.Println("GetCollection1 "+err.Error())
+		return nil,err
+	}
+//设定了切片初始长度,和容量,直接声明切片会index超出
+	reviews:=make([]Review,len(review_ids),30)
+	for i:=0; i<len(review_ids); i++{                        
+		if err:=Db.Self.Table("user_review").Where("review_id=?",review_ids[i]).Find(&reviews[i]).Error;err!=nil{
+			log.Println("GetCollection2 "+err.Error())
+			return nil,err
+		}
+	}
+	return reviews,nil
+}
 
 
 

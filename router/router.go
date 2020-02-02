@@ -21,6 +21,7 @@ func InitRouter(){
 	Router.GET("/api/v1/people/:user_id/albums/:album_id",hander.TheAlbum)
 	Router.POST("/api/v1/people/:user_id/albums/:album_id",hander.AddReviews)
 	Router.PUT("/api/v1/people/:user_id/albums/:album_id",hander.RemoveReviews)
+	Router.GET("/api/v1/people/:user_id/collection",hander.Collection)
 }
 
 
