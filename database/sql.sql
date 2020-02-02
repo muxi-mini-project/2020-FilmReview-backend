@@ -17,7 +17,7 @@ create table album (
     album_id char(3) not null,
     title varchar(30) not null,
     summary TINYTEXT not null,
-    content_sum varchar(3) not null
+    content_sum int not null
 );
 
 create table album_review (
