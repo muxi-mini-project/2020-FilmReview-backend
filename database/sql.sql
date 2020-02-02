@@ -14,7 +14,7 @@ create table follow (
 
 create table album (
     user_id char(6) not null,
-    album_id char(3) not null,
+    album_id int not null,
     title varchar(30) not null,
     summary TINYTEXT not null,
     content_sum int not null
@@ -22,7 +22,7 @@ create table album (
 
 create table album_review (
     user_id char(6) not null,
-    album_id char(3) not null,
+    album_id int not null,
     review_id int not null
 );
 
