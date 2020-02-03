@@ -7,7 +7,7 @@ info:
   title: server API
   
 host: localhost
-basePath: /
+basePath: /api/v1
 tags: 
   - name: user
     description: 用户
@@ -99,16 +99,13 @@ paths:
             properties:
               title: 
                 type: string
-              context:
+              content:
                 type: string
               tag: 
                 type: string
               picture:
                 type: string
                 description: 传照片的url
-              like_sum:
-                type: string
-                description: 点赞数  #传０就行
       responses:
         200:
           description: 登录成功
@@ -139,14 +136,21 @@ paths:
           description: 获取成功
           schema:
             properties:
-              followers:
+              Followers:
                 description: 关注
                 type: string
-              fans:
+              Fans:
                 description: 粉丝
                 type: string
-              user_id:
+              User_id:
                 type: string
+              Name: 
+                type: string
+              User_picture:
+                type: string
+              Attention:
+                type: boolean
+                description: 这个是获取其他用户信息时用的
         404:
           description: 没有该资源
         401:
@@ -165,6 +169,8 @@ paths:
           in: body
           schema:
             properties:
+              user_id:
+                type: string
               user_picture:
                 type: string
                 description: 头像图片的url
@@ -212,8 +218,6 @@ paths:
               $ref: "#/definitions/user_review"
         404:
           description: 没有该资源        
-        401:
-          description: token错误，没有权限
           
   /people/{user_id}/albums:
     get:
@@ -232,19 +236,19 @@ paths:
             type: array
             items:
               properties:
-                album_id: 
+                User_id:
                   type: string
-                title: 
+                Album_id: 
+                  type: integer
+                Title: 
                   type: string
-                summary:
+                Summary:
                     type: string
-                content_sum:
+                Content_sum:
                   description: 包含影评数
-                  type: string        
+                  type: integer      
         404:
           description: 没有该资源
-        401:
-          description: token错误，没有权限 
     post:
       tags:
         - user
@@ -263,9 +267,6 @@ paths:
                 type: string
               summary:
                 type: string
-              content_sum:                          #传0
-                description: 包含影评数
-                type: string
       responses:
         200:
           description: 专辑发布成功
@@ -274,12 +275,12 @@ paths:
               album_id: 
                 type: string          
         401:
-          description: token错误，没有权限
+          description: token错误，没有权限 
  
-    delete: 
+    put: 
       tags: 
         - user
-      summary: 删除专辑
+      summary: 移除专辑
       parameters: 
         - $ref: "#/parameters/token"
         - name: user_id
@@ -289,27 +290,29 @@ paths:
         - name: album_id
           in: body
           schema:
-            properties:
-              album_id:
-                type: string
+            type: array
+            items:
+              properties:
+                album_id:
+                  type: integer
       responses:
         200:
           description: 删除成功
         401:
           description: token错误，没有权限  
               
-  /people/{user_id}/albums/album_id:
+  /people/{user_id}/albums/{album_id}:
     get:
       tags: 
         - user
-      summary: 用户主页-专辑详情
+      summary: 专辑详情
       parameters: 
         - name: user_id
           in: path
           required: true
           type: string
         - name: album_id
-          in: query
+          in: path
           required: true
           type: string
       responses:
@@ -334,7 +337,7 @@ paths:
           required: true
           type: string
         - name: album_id
-          in: query
+          in: path
           required: true
           type: string
         - name: review
@@ -343,16 +346,18 @@ paths:
             type: array
             items:
               properties:
-                album_id:
+                user_id:
                   type: string
+                album_id: 
+                  type: integer
                 review_id:
-                  type: string
+                  type: integer
       responses:
         200:
           description: 添加成功
         401:
           description: token错误，没有权限  
-    delete: 
+    put: 
       tags: 
         - user
       summary: 从专辑中移除影评
@@ -363,7 +368,7 @@ paths:
           required: true
           type: string
         - name: album_id
-          in: query
+          in: path
           required: true
           type: string
         - name: review
@@ -372,10 +377,12 @@ paths:
             type: array
             items:
               properties:
-                album_id:
-                  type: string
+                user_id:
+                  type: integer
+                album_id: 
+                  type: integer
                 review_id:
-                  type: string
+                  type: integer
       responses:
         200:
           description: 删除成功
@@ -450,6 +457,7 @@ paths:
         - review
       summary: 某一影评
       parameters: 
+        - $ref: "#/parameters/token"
         - name: review_id
           in: path
           required: true
@@ -458,9 +466,16 @@ paths:
         200:
           description: 获取页面成功
           schema:
-            type: array
-            items:
-              $ref: "#/definitions/user_comment"
+            properties:
+              comments:
+                type: array
+                items:
+                  $ref: "#/definitions/user_comment"
+              review_like: 
+                type: boolean
+              review_collection: 
+                type: boolean
+          
         404:
           description: 没有该资源
     delete:
@@ -584,41 +599,35 @@ definitions:
       - review_id
       - user_id
     properties:
-      user_id:    #　这是路径里面user_id
+      User_id:    #　这是路径里面user_id
         type: string
-      name:
+      Name:
         type: string
-      user_picture:
+      User_picture:
         type: string
-      review_id:
+      Review_id:
+        type: integer
+      Title: 
         type: string
-      title: 
+      Content:
         type: string
-      context:
+      Time: 
         type: string
-      time: 
+      Tag: 
         type: string
-      tag: 
-        type: string
-      picture:
+      Picture:
         type: string
         description: 传照片的url
-      comment_sum:
-        type: string
-      like_sum:
-        type: string
+      Comment_sum:
+        type: integer
+      Like_sum:
+        type: integer
         description: 点赞数    
   
   comment:
     description: 评论信息
     properties:
-      comment_id:
-        type: string
       content:
-        type: string
-      time:
-        type: string
-      like_sum:
         type: string
 
 
@@ -628,26 +637,22 @@ definitions:
         - comment_id
         - user_id
       properties:
-        user_id:
+        User_id:
           type: string
-        user_name:
+        User_name:
           type: string
-        user_picture:
+        User_picture:
           type: string
-        comment_id:
+        Comment_id:
+          type: integer
+        Content:
           type: string
-        content:
+        Time:
           type: string
-        time:
-          type: string
-        like_sum:
-          type: string
-        comment_like:
+        Like_sum:
+          type: integer
+        Comment_like:
           description: 本用户是否点赞
-          type: boolean
-        review_like: 
-          type: boolean
-        review_collection: 
           type: boolean
           
 parameters:
@@ -656,25 +661,3 @@ parameters:
       in: header
       required: true
       type: string  
-  
-          
-
-              
-      
-                
-                
-                
-                
-
-                      
-                      
-                    
-                      
-                      
-    
-          
-                
-                
-                
-                
-                
