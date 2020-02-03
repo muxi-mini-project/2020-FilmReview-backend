@@ -10,7 +10,7 @@ type JWTClaims struct {
 	UserID string
 }
 
-var Secret = "sult"
+var Secret = "filmer"
 
 type StrToken struct {
 	Token string

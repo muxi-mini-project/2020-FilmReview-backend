@@ -2,20 +2,20 @@
 package Handler
 
 import (
-	"github.com/filmer/Func"
 	"github.com/gin-gonic/gin"
+	"github.com/filmer/Func"
 	//"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/database"
 	"github.com/filmer/model"
 	"log"
 	//"sync"
 	"strconv"
 	"time"
-	//"net/http"
-	//"github.com/dgrijalva/jwt-go"
-	//"errors"
+	"net/http"
+	"github.com/dgrijalva/jwt-go"
+	"errors"
 )
 
-/*func Login(c *gin.Context) {
+func Login(c *gin.Context) {
 	claims := &model.JWTClaims{
 		UserID:      "100001",
 	}
@@ -27,16 +27,16 @@ import (
 		return
 	}
 	c.String(http.StatusOK, signedToken)
-}*/
+}
 
-/*func getToken(claims *model.JWTClaims)(string,error){
+func getToken(claims *model.JWTClaims)(string,error){
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString([]byte(model.Secret))
 	if err != nil {
 		return "",errors.New("ServerBusy")
 	}
 	return signedToken,nil
-}*/
+}
 
 func Review(c *gin.Context) {
 	log.Println("ReviewHandler start!")
@@ -64,7 +64,7 @@ func Review(c *gin.Context) {
 	log.Println(review)
 	//成功获取信息
 	reviewID := model.Lastreviewid.Review_id + 1
-	model.Lastreviewid.Review_id++
+	model.Lastreviewid.Review_id ++
 
 	//获取userid的信息
 	userInfo, err := Func.GetUserInfo(claim.UserID)
@@ -89,7 +89,7 @@ func Review(c *gin.Context) {
 func GetReview(c *gin.Context) {
 	log.Println("API START")
 	review_id := c.Param("review_id")
-	reviewID, _ := strconv.Atoi(review_id)
+	reviewID,_ := strconv.Atoi(review_id)
 	log.Println(reviewID)
 	var comment []model.CommentInfo
 	var err error
@@ -102,9 +102,9 @@ func GetReview(c *gin.Context) {
 
 	//成功获取，获取token
 	var token model.StrToken
-	c.BindHeader(&token)
-	log.Println(token)
-	claim, err := Func.VerifyToken(token.Token)
+        c.BindHeader(&token)
+        log.Println(token)
+        claim, err := Func.VerifyToken(token.Token)
 	//如果没登陆，下面三个参数返回false
 	if err != nil {
 		log.Println(err)
@@ -130,12 +130,12 @@ func GetReview(c *gin.Context) {
 func DeleteReview(c *gin.Context) {
 	//先拿到id路径参数
 	review_id := c.Param("review_id")
-	reviewID, _ := strconv.Atoi(review_id)
+	reviewID,_ := strconv.Atoi(review_id)
 	//再查看token
 	var token model.StrToken
-	c.BindHeader(&token)
-	log.Println(token)
-	claim, err := Func.VerifyToken(token.Token)
+        c.BindHeader(&token)
+        log.Println(token)
+        claim, err := Func.VerifyToken(token.Token)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
@@ -158,12 +158,12 @@ func DeleteReview(c *gin.Context) {
 func ChangeReviewLike(c *gin.Context) {
 	//先拿到id路径参数
 	review_id := c.Param("review_id")
-	reviewID, _ := strconv.Atoi(review_id)
+	reviewID ,_ := strconv.Atoi(review_id)
 	//再查看token
 	var token model.StrToken
-	c.BindHeader(&token)
-	log.Println(token)
-	claim, err := Func.VerifyToken(token.Token)
+        c.BindHeader(&token)
+        log.Println(token)
+        claim, err := Func.VerifyToken(token.Token)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
@@ -180,12 +180,12 @@ func ChangeReviewLike(c *gin.Context) {
 func NewCollection(c *gin.Context) {
 	//先拿到id路径参数
 	review_id := c.Param("review_id")
-	reviewID, _ := strconv.Atoi(review_id)
+	reviewID ,_ := strconv.Atoi(review_id)
 	//再查看token
 	var token model.StrToken
-	c.BindHeader(&token)
-	log.Println(token)
-	claim, err := Func.VerifyToken(token.Token)
+        c.BindHeader(&token)
+        log.Println(token)
+        claim, err := Func.VerifyToken(token.Token)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
@@ -202,12 +202,12 @@ func NewCollection(c *gin.Context) {
 func NewComment(c *gin.Context) {
 	//先拿到id路径参数
 	review_id := c.Param("review_id")
-	reviewID, _ := strconv.Atoi(review_id)
+	reviewID,_ := strconv.Atoi(review_id)
 	//解析token
 	var token model.StrToken
-	c.BindHeader(&token)
-	log.Println(token)
-	claim, err := Func.VerifyToken(token.Token)
+        c.BindHeader(&token)
+        log.Println(token)
+        claim, err := Func.VerifyToken(token.Token)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
@@ -225,7 +225,7 @@ func NewComment(c *gin.Context) {
 
 	var commentID int
 	var err1 error
-	if err1, commentID = Func.NewComment(claim.UserID, reviewID, comment); err1 != nil {
+	if err1,commentID = Func.NewComment(claim.UserID, reviewID, comment); err1 != nil {
 		c.JSON(500, gin.H{
 			"message": "surver busy",
 		})
@@ -236,19 +236,19 @@ func NewComment(c *gin.Context) {
 	t := time.Now().Format("2006-01-02 15:04:05")
 	c.JSON(200, gin.H{
 		"comment_id": commentID,
-		"time":       t,
+		"time":      t,
 	})
 }
 
 func NewCommentLike(c *gin.Context) {
 	//先拿到id路径参数
 	comment_id := c.Param("comment_id")
-	commentID, _ := strconv.Atoi(comment_id)
+	commentID ,_ :=strconv.Atoi(comment_id)
 	//再查看token
 	var token model.StrToken
-	c.BindHeader(&token)
-	log.Println(token)
-	claim, err := Func.VerifyToken(token.Token)
+        c.BindHeader(&token)
+        log.Println(token)
+        claim, err := Func.VerifyToken(token.Token)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
@@ -267,9 +267,9 @@ func DeleteComment(c *gin.Context) {
 	comment_id := c.Param("comment_id")
 	//再查看token
 	var token model.StrToken
-	c.BindHeader(&token)
-	log.Println(token)
-	_, err := Func.VerifyToken(token.Token)
+        c.BindHeader(&token)
+        log.Println(token)
+        _, err := Func.VerifyToken(token.Token)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",

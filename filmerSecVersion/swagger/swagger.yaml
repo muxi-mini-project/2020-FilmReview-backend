@@ -136,19 +136,19 @@ paths:
           description: 获取成功
           schema:
             properties:
-              Followers:
+              followers:
                 description: 关注
                 type: string
-              Fans:
+              fans:
                 description: 粉丝
                 type: string
-              User_id:
+              user_id:
                 type: string
-              Name: 
+              name: 
                 type: string
-              User_picture:
+              user_picture:
                 type: string
-              Attention:
+              attention:
                 type: boolean
                 description: 这个是获取其他用户信息时用的
         404:
@@ -236,15 +236,15 @@ paths:
             type: array
             items:
               properties:
-                User_id:
+                user_id:
                   type: string
-                Album_id: 
+                album_id: 
                   type: integer
-                Title: 
+                title: 
                   type: string
-                Summary:
+                summary:
                     type: string
-                Content_sum:
+                content_sum:
                   description: 包含影评数
                   type: integer      
         404:
@@ -644,7 +644,7 @@ definitions:
         User_picture:
           type: string
         Comment_id:
-          type: integer
+          type: string
         Content:
           type: string
         Time:

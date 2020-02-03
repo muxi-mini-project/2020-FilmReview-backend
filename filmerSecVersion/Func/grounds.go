@@ -82,11 +82,10 @@ func GetGroundAll(userid string) ([]model.GroundInfosID, error) {
 	index := len(follows)
 	log.Println(index)
 
-	var ground []model.GroundInfosID
-	if follows[0].User_id2 == "" {
+	if follows.User_id2 == "" {
 		return ground,nil
 	}
-
+	var ground []model.GroundInfosID
 
 	wg := sync.WaitGroup{}
 	wg.Add(index)

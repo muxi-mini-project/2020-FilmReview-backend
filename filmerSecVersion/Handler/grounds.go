@@ -1,8 +1,8 @@
 package Handler
 
 import (
-	"github.com/filmer/Func"
 	"github.com/gin-gonic/gin"
+	"github.com/filmer/Func"
 	//"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/database"
 	"github.com/filmer/model"
 	"log"
@@ -14,7 +14,7 @@ func Grounds(c *gin.Context) {
 	var groundInfos []model.GroundInfos
 	var err error
 	model.Count += 4
-	if groundInfos, err = Func.GetGround(model.Count); err != nil { //原来是model.Count
+	if groundInfos, err = Func.GetGround(model.Count); err != nil {//原来是model.Count
 		c.JSON(404, gin.H{
 			"message": "Not Found",
 		})
@@ -36,9 +36,9 @@ func GroundsID(c *gin.Context) {
 	//user_id := c.Param("user_id")
 	//解析token
 	var token model.StrToken
-	c.BindHeader(&token)
-	log.Println(token)
-	claim, err := Func.VerifyToken(token.Token)
+        c.BindHeader(&token)
+        log.Println(token)
+        claim, err := Func.VerifyToken(token.Token)
 	if err != nil {
 		c.JSON(401, gin.H{
 			"message": "Wrong Token",
