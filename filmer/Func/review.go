@@ -26,7 +26,7 @@ import (
 
 func InsertReview(review model.Review, reviewID int, userInfo model.UserInfo, userid string) error {
 	sql := "insert into user_review(user_id,name,user_picture,review_id,title,content,tag,picture,comment_sum,like_sum) values"
-	sql += fmt.Sprintf("('%s','%s','%s',%d,'%s','%s','%s','%s',%d,%d);", userid, userInfo.Name, userInfo.User_picture, reviewID, review.Title, review.Content, review.Tag, review.Picture, 0, review.Like_sum)
+	sql += fmt.Sprintf("('%s','%s','%s',%d,'%s','%s','%s','%s',%d,%d);", userid, userInfo.Name, userInfo.User_picture, reviewID, review.Title, review.Content, review.Tag, review.Picture, 0, 0)
 	log.Println(sql)
 	err := database.DB.Exec(sql).Error
 	log.Println("InsertReview")

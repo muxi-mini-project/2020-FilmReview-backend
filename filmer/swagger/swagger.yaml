@@ -7,15 +7,12 @@ info:
   title: server API
   
 host: localhost
-basePath: /
+basePath: /api/v1
 tags: 
   - name: user
     description: 用户
   - name: review
     description: 影评
-  - name: comment
-    description: 对影评的评论
-    
 schemes: 
   - http
   - https
@@ -33,13 +30,9 @@ paths:
           description: post data
           schema:
             required:
-              - user_id
               - name
               - password
             properties:
-              user_id:
-                type: string
-                description: 用户账号　前端生成
               name:
                 type: string
                 description: 用户昵称
@@ -48,7 +41,11 @@ paths:
                 description: 密码
       responses: 
         200:
-          description: 注册成功
+          description: 注册成功,留住用户id
+          schema:
+            properties:
+              user_id: 
+                type: string
         400:
           description: 参数不全,客户端语法有问题
         401:
@@ -99,77 +96,41 @@ paths:
         - name: data
           in: body
           schema:
-            $ref: "#/definitions/review"
+            properties:
+              title: 
+                type: string
+              content:
+                type: string
+              tag: 
+                type: string
+              picture:
+                type: string
+                description: 传照片的url
       responses:
         200:
           description: 登录成功
+          schema:
+            properties:
+              review_id:
+                type: string
+              time:
+                type: string
         400:
           description: 参数不全，客户端语法有问题
         401:
           description: token错了, 权限不够   
-    delete:
-      tags:
-        - review
-      summary: 删除影评
-      parameters:
-        - $ref: "#/parameters/token"
-        - name: review_id
-          in: body
-          schema:
-            required:
-              - review_id
-            properties:
-              comment_id:
-                type: string
-      responses:
-        200:
-          description: 删除成功
-        401:
-          description: token验证失败，权限不够
-
-  /comment:
-    post:
-      tags:
-        - comment
-      summary: 发表评论
-      parameters: 
-        - $ref: "#/parameters/token"
-        - name: comment
-          in: body
-          schema:
-            $ref: "#/definitions/comment"
-      responses:
-        200:
-          description: 评论发布成功
-        401:
-          description: token错误，没有权限
-    delete:
-      tags:
-        - comment
-      summary: 删除评论
-      parameters: 
-        - $ref: "#/parameters/token"
-        - name: user_comment
-          in: body
-          schema:
-            properties:
-              user_id:
-                type: string
-              comment_id:
-                type: string
-      responses:
-        200:
-          description: 删除成功
-        401:
-          description: token错误，没有权限     
   
-  /people:
+  /people/{user_id}:
     get:
       tags:
         - user
       summary: 用户主页
       parameters:
         - $ref: "#/parameters/token"
+        - name: user_id
+          in: path
+          required: true
+          type: string
       responses:
         200:
           description: 获取成功
@@ -181,59 +142,73 @@ paths:
               fans:
                 description: 粉丝
                 type: string
+              user_id:
+                type: string
+              name: 
+                type: string
+              user_picture:
+                type: string
+              attention:
+                type: boolean
+                description: 这个是获取其他用户信息时用的
         404:
           description: 没有该资源
         401:
           description: token错误，没有权限
- 
-    post: 
+    put:
       tags:
         - user
-      summary: 修改用户昵称
-      parameters: 
+      summary: 修改用户信息
+      parameters:
         - $ref: "#/parameters/token"
-        - name: new_name
-          in: body
-          schema:
-            properties:
-              new_name:
-                type: string
-      responses:
-        200:
-          description: 修改成功
-        401:
-          description: token错误，没有权限
-          
-  /people/change_password:
-    post: 
-      tags:
-        - user
-      summary: 修改用户密码
-      parameters: 
-        - $ref: "#/parameters/token"
-        - name: userinfo
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: data
           in: body
           schema:
             properties:
               user_id:
                 type: string
-              password:
+              user_picture:
                 type: string
-              new_password:
+                description: 头像图片的url
+              user_name:
                 type: string
       responses:
         200:
-          description: 修改成功
+          description: OK
         401:
-          description: token或密码错误,没有权限
+          description: token错了,权限不够
+          
+    patch:
+      tags:
+        - user
+      summary: 关注用户/取消关注        ＃都调用这个接口，后台会判定
+      parameters: 
+        - $ref: "#/parameters/token"
+        - name: user_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+        401:
+          description: token错了,权限不够         
+      
   
-  /people/review:
+  /people/{user_id}/myreviews:
     get:
       tags: 
         - user
       summary: 用户主页-我的影评
       parameters: 
-        - $ref: "#/parameters/token"
+        - name: user_id
+          in: path
+          required: true
+          type: string
       responses:
         200:
           description: 获取成功
@@ -243,87 +218,99 @@ paths:
               $ref: "#/definitions/user_review"
         404:
           description: 没有该资源        
-        401:
-          description: token错误，没有权限
           
-  /people/album:
+  /people/{user_id}/albums:
     get:
       tags: 
         - user
       summary: 用户主页-专辑
       parameters: 
-        - $ref: "#/parameters/token"
+        - name: user_id
+          in: path
+          required: true
+          type: string
       responses:
         200:
           description: 获取成功
-          schema:   
-            properties:
-              album_id: 
-                type: string
-              title: 
-                type: string
-              summary:
-                type: string
-              sum:
-                description: 包含影评数
-                type: string        
+          schema:  
+            type: array
+            items:
+              properties:
+                user_id:
+                  type: string
+                album_id: 
+                  type: integer
+                title: 
+                  type: string
+                summary:
+                    type: string
+                content_sum:
+                  description: 包含影评数
+                  type: integer      
         404:
           description: 没有该资源
-        401:
-          description: token错误，没有权限 
     post:
       tags:
         - user
       summary: 创建专辑
       parameters: 
         - $ref: "#/parameters/token"
+        - name: user_id
+          in: path
+          required: true
+          type: string
         - name: album_create
           in: body
           schema:
             properties: 
-              album_id: 
-                type: string
               title: 
                 type: string
               summary:
                 type: string
-              sum:
-                description: 包含影评数
-                type: string
       responses:
         200:
           description: 专辑发布成功
+          schema:
+            properties: 
+              album_id: 
+                type: string          
         401:
-          description: token错误，没有权限
+          description: token错误，没有权限 
  
-    delete: 
+    put: 
       tags: 
         - user
-      summary: 删除专辑
+      summary: 移除专辑
       parameters: 
         - $ref: "#/parameters/token"
-        - name: album_delete
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: album_id
           in: body
           schema:
-            properties:
-              user_id:
-                type: string
-              album_id:
-                type: string
+            type: array
+            items:
+              properties:
+                album_id:
+                  type: integer
       responses:
         200:
           description: 删除成功
         401:
           description: token错误，没有权限  
-      
               
-  /people/{album_id}:
+  /people/{user_id}/albums/{album_id}:
     get:
       tags: 
         - user
-      summary: 用户主页-专辑详情
+      summary: 专辑详情
       parameters: 
-        - $ref: "#/parameters/token"
+        - name: user_id
+          in: path
+          required: true
+          type: string
         - name: album_id
           in: path
           required: true
@@ -339,14 +326,80 @@ paths:
           description: 没有该资源
         401:
           description: token错误，该用户没有登陆
+    post:   
+      tags: 
+        - user
+      summary: 添加影评到专辑
+      parameters:
+        - $ref: "#/parameters/token"
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: album_id
+          in: path
+          required: true
+          type: string
+        - name: review
+          in: body
+          schema:
+            type: array
+            items:
+              properties:
+                user_id:
+                  type: string
+                album_id: 
+                  type: integer
+                review_id:
+                  type: integer
+      responses:
+        200:
+          description: 添加成功
+        401:
+          description: token错误，没有权限  
+    put: 
+      tags: 
+        - user
+      summary: 从专辑中移除影评
+      parameters:
+        - $ref: "#/parameters/token"
+        - name: user_id
+          in: path
+          required: true
+          type: string
+        - name: album_id
+          in: path
+          required: true
+          type: string
+        - name: review
+          in: body
+          schema:
+            type: array
+            items:
+              properties:
+                user_id:
+                  type: integer
+                album_id: 
+                  type: integer
+                review_id:
+                  type: integer
+      responses:
+        200:
+          description: 删除成功
+        401:
+          description: token错误，没有权限 
   
-  /people/collection:
+  /people/{user_id}/collection:
     get:
       tags: 
         - user
       summary: 用户主页-收藏
       parameters: 
         - $ref: "#/parameters/token"
+        - name: user_id
+          in: path
+          required: true
+          type: string
       responses:
         200:
           description: 获取成功
@@ -359,28 +412,8 @@ paths:
         401:
           description: token错误，该用户没有登陆
       
-  /people/set_portrait:
-    post:
-      tags:
-        - user
-      summary: 设置用户头像
-      parameters:
-        - $ref: "#/parameters/token"
-        - name: data
-          in: body
-          schema:
-            properties:
-              user_picture:
-                type: string
-                description: 头像图片的url
-      responses:
-        200:
-          description: OK
-        401:
-          description: token错了,不是该用户  
-
   
-  /find:
+  /grounds:
     get:
       tags: 
         - review
@@ -395,13 +428,17 @@ paths:
         404:
           description: 没有找到资源
   
-  /my_follow_review:
+  /grounds/{user_id}:
     get:
       tags: 
         - review
       summary: 关注界面
       parameters: 
         - $ref: "#/parameters/token"
+        - name: user_id
+          in: path
+          required: true
+          type: string
       responses: 
         200: 
           description: 请求成功
@@ -413,259 +450,148 @@ paths:
           description: 没有找到资源
         401:
           description: token错误，没有权限
-
-  /review_like:
-    post: 
-      tags: 
-        - review
-      summary: 对影评点赞
-      parameters: 
-        - $ref: "#/parameters/token"
-        - name: aim_review
-          in: body
-          schema:
-            properties: 
-              user_id: 
-                type: string
-              review_id: 
-                type: string
-      responses:
-        200:
-          description: 点赞成功
-        401:
-          description: token错误，没有权限
-    delete:
-      tags: 
-        - review
-      summary: 取消影评点赞
-      parameters: 
-        - $ref: "#/parameters/token"
-        - name: aim_review
-          in: body
-          schema:
-            properties: 
-              user_id: 
-                type: string
-              review_id: 
-                type: string
-      responses:
-        200:
-          description: 取消成功
-        401:
-          description: token错误，没有权限
-  
-  /review_collection:
-    post: 
-      tags: 
-        - review
-      summary: 收藏影评
-      parameters: 
-        - $ref: "#/parameters/token"
-        - name: aim_review
-          in: body
-          schema:
-            properties: 
-              user_id: 
-                type: string
-              review_id: 
-                type: string
-      responses:
-        200:
-          description: 收藏成功
-        401:
-          description: token错误，没有权限
-
-    delete:
-      tags:
-        - review
-      summary: 取消收藏
-      parameters: 
-        - $ref: "#/parameters/token"
-        - name: aim_review
-          in: body
-          schema:
-            properties:
-              user_id:
-                type: string
-              review_id:
-                type: string
-      responses:
-        200:
-          description: 取消成功
-        401:
-          description: token错误，没有权限  
           
-  /comment_like:
-    post: 
-      tags: 
-        - comment
-      summary: 对评论点赞
-      parameters: 
-        - $ref: "#/parameters/token"
-        - name: aim_comment
-          in: body
-          schema:
-            properties: 
-              user_id: 
-                type: string
-              comment_id: 
-                type: string
-      responses:
-        200:
-          description: 点赞成功
-        401:
-          description: token错误，没有权限
- 
-    delete:  
-      tags:
-        - comment
-      summary: 取消点赞
-      parameters: 
-        - $ref: "#/parameters/token"
-        - name: aim_comment
-          in: body
-          schema:
-            properties:
-              user_id:
-                type: string
-              comment_id:
-                type: string
-      responses:
-        200:
-          description: 取消成功
-        401:
-          description: token错误，没有权限  
- 
-  /my_follow:    
+  /reviews/{review_id}:
     get:
       tags: 
-        - user
-      summary: 用户关注的人
-      parameters: 
-        - $ref: "#/parameters/token"
-      responses:
-        200:
-          description: 获取成功
-          schema:   
-            type: array
-            items:
-              $ref: "#/definitions/user"
-        404:
-          description: 没有该资源
-        401:
-          description: token错误，没有权限  
-    
-  /fans:
-    get:
-      tags: 
-        - user
-      summary: 用户粉丝
-      parameters: 
-        - $ref: "#/parameters/token"
-        - name: user_id
-          description: 要查询的用户的id
-          in: body
-          schema:
-            properties:
-              user_id:
-                type: string
-      responses:
-        200:
-          description: 获取成功
-          schema:   
-            type: array
-            items:
-              $ref: "#/definitions/user"
-        404:
-          description: 没有该资源
-        401:
-          description: token错误，没有权限  
-          
-  /follow_one:
-    post:
-      tags:
-        - user
-      summary: 关注用户
-      parameters: 
-        - $ref: "#/parameters/token"
-        - name: aim_user
-          in: body
-          schema:
-            properties:
-              user_id: 
-                description: 要关注的用户id
-                type: string
-      responses:
-        200:
-          description: 关注成功
-        401:
-          description: token错误，没有权限     
-    delete: 
-      tags:
-        - user
-      summary: 取消关注
-      parameters: 
-        - $ref: "#/parameters/token"
-        - name: aim_user
-          in: body
-          schema:
-            properties:
-              user_id:
-                description: 要取消关注的用户id
-                type: string
-      responses:
-        200:
-          description: 删除成功
-        401:
-          description: token错误，没有权限        
-  
-  /review/{review_id}:
-    get:
-      tags:
         - review
-      summary: 查看具体影评
-      parameters:
-          - name: review_id
-            in: path
-            required: true
-            type: string
+      summary: 某一影评
+      parameters: 
+        - $ref: "#/parameters/token"
+        - name: review_id
+          in: path
+          required: true
+          type: string
       responses:
         200:
           description: 获取页面成功
           schema:
-            type: array
-            items:
-              $ref: "#/definitions/user_comment"
+            properties:
+              comments:
+                type: array
+                items:
+                  $ref: "#/definitions/user_comment"
+              review_like: 
+                type: boolean
+              review_collection: 
+                type: boolean
+          
+        404:
+          description: 没有该资源
+    delete:
+      tags:
+        - review
+      summary: 删除影评
+      parameters:
+        - $ref: "#/parameters/token"
+        - name: review_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: 删除成功
+        401:
+          description: token验证失败，权限不够
+    put:
+      tags: 
+        - review
+      summary: 对影评点赞/取消点赞  #取消点赞也调用这个接口，后台会判定
+      parameters: 
+        - $ref: "#/parameters/token"
+        - name: review_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: 成功
+        401:
+          description: token错误，没有权限
+    patch:
+      tags: 
+        - review
+      summary: 收藏/取消收藏
+      parameters: 
+        - $ref: "#/parameters/token"
+        - name: review_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: 成功
+        401:
+          description: token错误，没有权限
+          
+  /reviews/{review_id}/comment:
+    post:
+      tags:
+        - review
+      summary: 发表评论
+      parameters: 
+        - $ref: "#/parameters/token"
+        - name: review_id
+          in: path
+          required: true
+          type: string
+        - name: comment
+          in: body
+          schema:
+            $ref: "#/definitions/comment"  #创建的时候你们没有时间和ｉｄ，发空值就行,点赞数传０
+      responses:
+        200:  
+          description: 评论发布成功
+          schema:
+            properties:
+              comment_id:
+                type: string
+              time: 
+                type: string
+        401:
+          description: token错误，没有权限
+  
+          
+  /reviews/comments/{comment_id}:
+    put: 
+      tags: 
+        - review
+      summary: 对评论点赞/取消
+      parameters: 
+        - $ref: "#/parameters/token"  
+        - name: comment_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: 成功
+        401:
+          description: token错误，没有权限
+    delete:
+      tags:
+        - review
+      summary: 删除评论
+      parameters: 
+        - $ref: "#/parameters/token"
+        - name: comment_id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: 删除成功
+        401:
+          description: token错误，没有权限 
+          
+
+
+ 
+ 
+
           
 
 definitions:
-  review:
-    description: 单纯的影评
-    properties:
-      review_id:
-        type: string
-      title: 
-        type: string
-      context:
-        type: string
-      time: 
-        type: string
-      tag: 
-        type: string
-      picture:
-        type: string
-        description: 传照片的url
-      like_sum:
-        type: string
-        description: 点赞数
-  user:
-    properties:
-      user_id:
-        type: string
-      user_picture:
-        type: string
-      user_name:
-        type: string
         
   user_review:
     description: 一个信息块，同时显示影评和用户信息
@@ -673,44 +599,35 @@ definitions:
       - review_id
       - user_id
     properties:
-      user_id: 
+      User_id:    #　这是路径里面user_id
         type: string
-      name:
+      Name:
         type: string
-      user_picture:
+      User_picture:
         type: string
-      review_id:
+      Review_id:
+        type: integer
+      Title: 
         type: string
-      title: 
+      Content:
         type: string
-      context:
+      Time: 
         type: string
-      time: 
+      Tag: 
         type: string
-      tag: 
-        type: string
-      picture:
+      Picture:
         type: string
         description: 传照片的url
-      like_sum:
-        type: string
+      Comment_sum:
+        type: integer
+      Like_sum:
+        type: integer
         description: 点赞数    
   
   comment:
     description: 评论信息
-    required:
-      - comment_id
-      - review_id
     properties:
-      review_id:
-        type: string
-      comment_id:
-        type: string
       content:
-        type: string
-      time:
-        type: string
-      like_sum:
         type: string
 
 
@@ -720,26 +637,22 @@ definitions:
         - comment_id
         - user_id
       properties:
-        user_id:
+        User_id:
           type: string
-        user_name:
+        User_name:
           type: string
-        user_picture:
+        User_picture:
           type: string
-        comment_id:
+        Comment_id:
           type: string
-        content:
+        Content:
           type: string
-        time:
+        Time:
           type: string
-        like_sum:
-          type: string
-        comment_like:
+        Like_sum:
+          type: integer
+        Comment_like:
           description: 本用户是否点赞
-          type: boolean
-        review_like: 
-          type: boolean
-        review_collection: 
           type: boolean
           
 parameters:
@@ -748,25 +661,3 @@ parameters:
       in: header
       required: true
       type: string  
-  
-          
-
-
-              
-      
-                
-                
-                
-
-                      
-                      
-                    
-                      
-                      
-    
-          
-                
-                
-                
-                
-                
