@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	//"github.com/filmer/modelWency"
 	"log"
-    "github.com/filmer/searchAPI"
+    "github.com/filmer/SearchApi"
 )
 
 func init() {
@@ -32,8 +32,8 @@ func main() {
 	router.POST("/api/v1/reviews/:review_id/comment", Handler.NewComment)
 	router.PUT("/api/v1/review/comments/:comment_id", Handler.NewCommentLike)
 	router.DELETE("/api/v1/review/comments/:comment_id", Handler.DeleteComment)
-    router.POST("/api/v1/searcher/results",SeachAPI.Searcher)
-    router.POST("/api/v1/searcher/tags",SearchAPI.ReturnSearch)
+    router.POST("/api/v1/searcher/results",SearchApi.Searcher)
+    router.POST("/api/v1/searcher/tags",SearchApi.ReturnSearch)
 
 	router.POST("/api/v1/createuser", Handler.CreateUser)
 	router.POST("/api/v1/login", Handler.Login)
