@@ -75,6 +75,7 @@ func Review(c *gin.Context) {
 		c.JSON(500, gin.H{
 			"message": "server bussy",
 		})
+		return
 	}
 
 	//请求成功，获取时间并返回
@@ -171,7 +172,12 @@ func ChangeReviewLike(c *gin.Context) {
 		return
 	}
 
-	Func.ChangeReviewLikeFunc(claim.UserID, reviewID)
+	if err2 := Func.ChangeReviewLikeFunc(claim.UserID, reviewID); err2 != nil {
+		c.JSON(500, gin.H{
+			"message": "server busy",
+		})
+		return
+	}
 	c.JSON(200, gin.H{
 		"message": "ok",
 	})
@@ -193,7 +199,12 @@ func NewCollection(c *gin.Context) {
 		return
 	}
 
-	Func.NewCollection(claim.UserID, reviewID)
+	if err2 := Func.NewCollection(claim.UserID, reviewID); err2 != nil {
+		c.JSON(500, gin.H{
+			"message": "ok",
+		})
+		return
+	}
 	c.JSON(200, gin.H{
 		"message": "ok",
 	})
@@ -256,7 +267,12 @@ func NewCommentLike(c *gin.Context) {
 		return
 	}
 
-	Func.NewCommentLike(claim.UserID, commentID)
+	if err2 := Func.NewCommentLike(claim.UserID, commentID); err2 != nil {
+		c.JSON(500, gin.H{
+			"message": "server busy",
+		})
+		return
+	}
 	c.JSON(200, gin.H{
 		"message": "ok",
 	})
@@ -277,8 +293,17 @@ func DeleteComment(c *gin.Context) {
 		return
 	}
 
-	commentID, _ := strconv.Atoi(comment_id)
-	Func.DeleteCommentFunc(commentID)
+	if commentID, err2 := strconv.Atoi(comment_id); err2 != nil {
+		c.JSON(500, gin.H{
+			"message": "server busy",
+		})
+	}
+	if err := Func.DeleteCommentFunc(commentID); err != nil {
+		c.JSON(500, gin.H{
+			"message": "server busy",
+		})
+		return
+	}
 	c.JSON(200, gin.H{
 		"message": "ok",
 	})

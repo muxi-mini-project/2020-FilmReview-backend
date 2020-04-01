@@ -18,6 +18,56 @@ schemes:
   - https
   
 paths:
+  /searcher/results:
+    post:
+      tags:
+        - searcher
+      parameters:
+        - name: data
+          in: body
+          schema:
+            required:
+              - words
+            properties:
+              words:
+                type: string
+                description: 用户输入的句子
+      responses:
+        200:
+          description: 请求成功
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/user_review"
+        404:
+          description: 没有找到资源
+
+  /searcher/tags:
+    post:
+      tags:
+        - searcher
+      parameters:
+        - name: data
+          in: body
+          schema:
+            required:
+              - words
+            properties:
+              words:
+                type: string
+                description: 用户输入的句子
+      responses:
+        200:
+          description: 请求成功
+          schema:
+            type: array
+            items:
+             properties:
+                tag:
+                  type: string
+        404:
+          description: 没有找到资源
+
   /createuser:
     post:
       tags:
