@@ -1,9 +1,13 @@
-package searchApi
+package SearchApi
 
 type word struct {
-    Word string
+	Words string
 }
 
 type tag struct {
-    Tag string
+	Tag string
+}
+
+type reviewid struct {
+	Review_id int
 }

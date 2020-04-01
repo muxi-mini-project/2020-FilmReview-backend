@@ -14,9 +14,9 @@ type Review struct {
     count string
 }*/
 
+//删掉了user_picture字段
 type UserInfo struct {
-	Name         string
-	User_picture string
+	Name string
 }
 
 type CommentInfo struct {
@@ -50,7 +50,7 @@ type ReviewID struct {
 
 type ReviewLike struct {
 	Review_id int
-	User_id string
+	User_id   string
 }
 
 type LikeSum struct {
@@ -58,7 +58,7 @@ type LikeSum struct {
 }
 
 type Collection struct {
-	User_id string
+	User_id   string
 	Review_id int
 }
 
@@ -67,9 +67,9 @@ type CommentSum struct {
 }
 
 type CommentLike struct {
-	User_id string
+	User_id    string
 	Comment_id int
-	Review_id int
+	Review_id  int
 }
 
 type CommentLikeSum struct {

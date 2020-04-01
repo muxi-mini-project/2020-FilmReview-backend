@@ -1,16 +1,16 @@
 package model
 
 import (
-	"github.com/dgrijalva/jwt-go"
+//	"github.com/dgrijalva/jwt-go"
 )
 
 //token的结构体
-type JWTClaims struct {
+/*type JWTClaims struct {
 	jwt.StandardClaims
 	UserID string
-}
+}*/
 
-var Secret = "sult"
+var Secret = "sault"
 
 type StrToken struct {
 	Token string
