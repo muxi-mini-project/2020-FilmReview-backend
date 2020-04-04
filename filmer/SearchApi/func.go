@@ -3,8 +3,8 @@ package SearchApi
 import (
 	"errors"
 	"fmt"
-	"github.com/filmer/database"
-	"github.com/filmer/model"
+	"github.com/filmer2/database"
+	"github.com/filmer2/model"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/huichen/sego"
 	"log"

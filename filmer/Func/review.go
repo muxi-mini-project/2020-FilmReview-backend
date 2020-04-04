@@ -2,17 +2,16 @@
 package Func
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	//"github.com/gin-gonic/gin"
-	"github.com/filmer/database"
-	"github.com/filmer/model"
+	"github.com/filmer2/database"
+	"github.com/filmer2/model"
 	_ "github.com/go-sql-driver/mysql"
 	//"log"
 	//"strconv"
 	"errors"
-	"sync"
+	//"sync"
 )
 
 //通过全局变量CountSum实现
@@ -111,7 +110,7 @@ func GetCommentLike(userID string, comment *[]model.CommentInfo) error {
 	return nil
 }
 
-func GetExtraInfo(comment *[]model.CommentInfo, userID string, reviewID int) (bool, bool) {
+func GetExtraInfo(comment *[]model.CommentInfo, userID string, reviewID int) (error,bool, bool) {
 	var col, rev bool
 	var err1, err2, err3 error
 	log.Println(len((*comment)))
@@ -125,16 +124,16 @@ func GetExtraInfo(comment *[]model.CommentInfo, userID string, reviewID int) (bo
 	}()
 
 	go func() {
-		rev = GetReviewLike(reviewID, userID)
+		err2,rev = GetReviewLike(reviewID, userID)
 		errChannel <- err2
 	}()
 	go func() {
-		GetCommentLike(userID, comment)
+		err3=GetCommentLike(userID, comment)
 		errChannel <- err3
 	}()
 
 	for i := 0; i < 3; i++ {
-		if <-errChannel {
+		if err:=<-errChannel;err!=nil {
 			return errors.New("Get Extra Fail"), false, false
 		}
 	}
@@ -233,7 +232,7 @@ func ChangeReviewLikeFunc(userID string, reviewID int) error {
 	sql := "select *from review_like where user_id = " + userID + " AND review_id = "
 	sql += fmt.Sprintf("%d", reviewID)
 	var reviewlike model.ReviewLike
-	if err := database.DB.Raw(sql).Scan(&reviewlike); err != nil {
+	if err := database.DB.Raw(sql).Scan(&reviewlike).Error; err != nil {
 		return err
 	}
 	log.Println(reviewlike)
@@ -280,7 +279,7 @@ func ChangeReviewLikeFunc(userID string, reviewID int) error {
 	}()
 
 	for i := 0; i < 2; i++ {
-		if err := <-errChannel; err != nil {
+		if err := <-errChannel2; err != nil {
 			return err
 		}
 	}
@@ -340,7 +339,7 @@ func NewCollection(userID string, reviewID int) error {
 
 	sql1 := "delete from collection where user_id = " + userID + " AND review_id = "
 	sql1 += fmt.Sprintf("%d ;", reviewID)
-	if err3 := database.DB.Exec(sql1); err3 != nil {
+	if err3 := database.DB.Exec(sql1).Error; err3 != nil {
 		return err3
 	}
 	return nil
@@ -421,7 +420,7 @@ func NewComment(userID string, reviewID int, comment model.Comment) (error, int)
 	}()
 
 	for i := 0; i < 2; i++ {
-		if err := errChannel; err != nil {
+		if err := <-errChannel; err != nil {
 			return err, 0
 		}
 	}
@@ -531,7 +530,7 @@ func NewCommentLike(userID string, commentID int) error {
 		}()
 
 		for i := 0; i < 2; i++ {
-			if err := errChannel2; err != nil {
+			if err := <-errChannel2; err != nil {
 				return err
 			}
 		}
@@ -554,7 +553,7 @@ func NewCommentLike(userID string, commentID int) error {
 	}()
 
 	for i := 0; i < 2; i++ {
-		if err := <-erChannel3; err != nil {
+		if err := <-errChannel3; err != nil {
 			return err
 		}
 	}
@@ -570,7 +569,7 @@ func DeleteComment(commentID int) error {
 	return nil
 }
 
-func DeleteCommentLike(commentID int) {
+func DeleteCommentLike(commentID int) error {
 	sql := "delete from comment_like where comment_id = "
 	sql += fmt.Sprintf("%d ;", commentID)
 	if err := database.DB.Exec(sql).Error; err != nil {

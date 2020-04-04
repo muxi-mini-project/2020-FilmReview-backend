@@ -1,7 +1,7 @@
 package SearchApi
 
 import (
-	"github.com/filmer/model"
+	"github.com/filmer2/model"
 	"github.com/gin-gonic/gin"
 	"log"
 )

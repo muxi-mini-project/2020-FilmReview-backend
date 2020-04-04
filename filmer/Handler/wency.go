@@ -1,7 +1,7 @@
 package Handler
 
 import (
-	"github.com/filmer/modelWency"
+	"github.com/filmer2/modelWency"
 	"github.com/gin-gonic/gin"
 	"log"
 	"strconv"
@@ -72,7 +72,7 @@ func PeopleInfo(c *gin.Context) {
 		return
 	}
 	userInfo := modelWency.UserInfo{Followers: followers, Fans: fans, UserID: user.UserID, UserPicture: user.UserPicture, Name: user.Name, Attention: attention}
-	c.JSON(200, gin.H{"userInfo": userInfo})
+	c.JSON(200, userInfo)
 }
 
 //修改用户信息
@@ -121,7 +121,7 @@ func MyReviews(c *gin.Context) {
 		c.JSON(400, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"reviews": reviews})
+	c.JSON(200,  reviews)
 }
 
 //创建专辑
@@ -172,7 +172,7 @@ func Albums(c *gin.Context) {
 		c.JSON(400, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"albums": albums})
+	c.JSON(200, albums)
 }
 
 //专辑详情
@@ -185,7 +185,7 @@ func TheAlbum(c *gin.Context) {
 		c.JSON(400, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"reviews": reviews})
+	c.JSON(200, reviews)
 }
 
 //添加影评到专辑
@@ -246,5 +246,5 @@ func Collection(c *gin.Context) {
 		c.JSON(400, gin.H{"message": err2.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"reviews": reviews})
+	c.JSON(200, reviews)
 }

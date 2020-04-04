@@ -2,10 +2,10 @@
 package Handler
 
 import (
-	"github.com/filmer/Func"
+	"github.com/filmer2/Func"
 	"github.com/gin-gonic/gin"
 	//"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/database"
-	"github.com/filmer/model"
+	"github.com/filmer2/model"
 	"log"
 	//"sync"
 	"strconv"
@@ -119,7 +119,12 @@ func GetReview(c *gin.Context) {
 	//登陆了还要获取参数
 	log.Println("have token")
 
-	rev, col := Func.GetExtraInfo(&comment, claim.UserID, reviewID)
+	err,rev, col := Func.GetExtraInfo(&comment, claim.UserID, reviewID)
+	if err != nil {
+		c.JSON(500,gin.H{
+			"message":"server busy",
+		})
+	}
 
 	c.JSON(200, gin.H{
 		"comment":           comment,
@@ -293,7 +298,8 @@ func DeleteComment(c *gin.Context) {
 		return
 	}
 
-	if commentID, err2 := strconv.Atoi(comment_id); err2 != nil {
+	commentID, err2 := strconv.Atoi(comment_id)
+	if err2 != nil {
 		c.JSON(500, gin.H{
 			"message": "server busy",
 		})

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/filmer/model"
-	"github.com/filmer/modelWency"
+	"github.com/filmer2/model"
+	"github.com/filmer2/modelWency"
 	"log"
 )
 

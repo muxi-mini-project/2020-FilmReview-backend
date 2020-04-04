@@ -1,10 +1,10 @@
 package Handler
 
 import (
-	"github.com/filmer/Func"
+	"github.com/filmer2/Func"
 	"github.com/gin-gonic/gin"
 	//"github.com/muxi-mini-project/2020-FilmReview-backend/filmer/database"
-	"github.com/filmer/model"
+	"github.com/filmer2/model"
 	"log"
 )
 

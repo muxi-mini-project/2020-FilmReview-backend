@@ -4,8 +4,8 @@ package Func
 import (
 	"errors"
 	//"github.com/gin-gonic/gin"
-	"github.com/filmer/database"
-	"github.com/filmer/model"
+	"github.com/filmer2/database"
+	"github.com/filmer2/model"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"strconv"
@@ -105,8 +105,8 @@ func GetGroundAll(userid string) ([]model.GroundInfosID, error) {
 	}
 
 	for i := 0; i < index; i++ {
-		if <-errChannel {
-			return nil, errors, New("Get Ground Fail")
+		if err:=<-errChannel;err!=nil {
+			return nil, errors.New("Get Ground Fail")
 		}
 	}
 	return ground, nil

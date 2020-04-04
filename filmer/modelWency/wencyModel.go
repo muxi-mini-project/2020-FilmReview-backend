@@ -3,7 +3,7 @@ package modelWency
 import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/filmer/database"
+	"github.com/filmer2/database"
 	"log"
 	"strconv"
 )
