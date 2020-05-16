@@ -90,13 +90,18 @@ func Review(c *gin.Context) {
 func GetReview(c *gin.Context) {
 	log.Println("API START")
 	review_id := c.Param("review_id")
-	reviewID, _ := strconv.Atoi(review_id)
+	if reviewID, err := strconv.Atoi(review_id);err != nil{
+        c.JSON(500,gin.H{
+            "message":"server busy",
+        })
+        return
+    }
 	log.Println(reviewID)
 	var comment []model.CommentInfo
 	var err error
 	if comment, err = Func.GetReview(reviewID); err != nil {
 		c.JSON(500, gin.H{
-			"message": "surver busy",
+			"message": "server busy",
 		})
 		return
 	}
@@ -136,7 +141,12 @@ func GetReview(c *gin.Context) {
 func DeleteReview(c *gin.Context) {
 	//先拿到id路径参数
 	review_id := c.Param("review_id")
-	reviewID, _ := strconv.Atoi(review_id)
+	if reviewID, err := strconv.Atoi(review_id);err != nil{
+        c.JSON(500,gin.H{
+            "message":"server busy",
+        })
+        return
+    }
 	//再查看token
 	var token model.StrToken
 	c.BindHeader(&token)
@@ -164,7 +174,12 @@ func DeleteReview(c *gin.Context) {
 func ChangeReviewLike(c *gin.Context) {
 	//先拿到id路径参数
 	review_id := c.Param("review_id")
-	reviewID, _ := strconv.Atoi(review_id)
+	if reviewID, err := strconv.Atoi(review_id);err!=nil{
+        c.JSON(500,gin.H{
+            "message":"server busy",
+        })
+        return
+    }
 	//再查看token
 	var token model.StrToken
 	c.BindHeader(&token)
@@ -206,7 +221,7 @@ func NewCollection(c *gin.Context) {
 
 	if err2 := Func.NewCollection(claim.UserID, reviewID); err2 != nil {
 		c.JSON(500, gin.H{
-			"message": "ok",
+			"message": "server busy",
 		})
 		return
 	}
@@ -218,7 +233,12 @@ func NewCollection(c *gin.Context) {
 func NewComment(c *gin.Context) {
 	//先拿到id路径参数
 	review_id := c.Param("review_id")
-	reviewID, _ := strconv.Atoi(review_id)
+	if reviewID, err := strconv.Atoi(review_id){
+        c.JSON(500,gin.H{
+            "message":"server busy",
+        })
+        return
+    }
 	//解析token
 	var token model.StrToken
 	c.BindHeader(&token)
@@ -259,7 +279,12 @@ func NewComment(c *gin.Context) {
 func NewCommentLike(c *gin.Context) {
 	//先拿到id路径参数
 	comment_id := c.Param("comment_id")
-	commentID, _ := strconv.Atoi(comment_id)
+	if commentID, err := strconv.Atoi(comment_id);err!=nil{
+        c.JSON(500,gin.H{
+            "message":"server busy",
+        })
+        return
+    }
 	//再查看token
 	var token model.StrToken
 	c.BindHeader(&token)

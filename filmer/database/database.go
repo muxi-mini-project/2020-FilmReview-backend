@@ -13,7 +13,7 @@ var DB *gorm.DB
 func InitDB(DB *gorm.DB) *gorm.DB {
 	log.Println("DB Connect Start")
 	//连接数据库(考虑改成全局变量)
-	DB, err := gorm.Open("mysql", "root:15811852133@/filmer?charset=utf8&parseTime=True&loc-Local")
+	DB, err := gorm.Open("mysql", "root:@/filmer?charset=utf8&parseTime=True&loc-Local")
 	if err != nil {
 		panic(err)
 	}
